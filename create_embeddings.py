@@ -3,8 +3,8 @@ import pickle
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
                         help='Text which needs to be included in all URLs which should be considered',
                         default='https://www.paepper.com/blog/posts')
     parser.add_argument('-z', '--zendesk', type=str, required=False,
-                        help='URL to your zendesk api')
+                        help='URL to your zendesk api', default='https://support.strikingly.com/api/v2/help_center/en-us/articles.json')
     args = parser.parse_args()
 
     if args.mode == 'sitemap':
@@ -61,5 +61,8 @@ if __name__ == '__main__':
         print(f"Split {page['source']} into {len(splits)} chunks")
 
     store = FAISS.from_texts(docs, OpenAIEmbeddings(), metadatas=metadatas)
-    with open("faiss_store.pkl", "wb") as f:
-        pickle.dump(store, f)
+    # with open("faiss_store.pkl", "wb") as f:
+    #     pickle.dump(store, f)
+
+# 使用 FAISS 自带的方法保存
+store.save_local("faiss_store")  # 生成两个文件：faiss_store/index.pkl 和 faiss_store/index.faiss
